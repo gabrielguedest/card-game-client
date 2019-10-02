@@ -29,7 +29,10 @@ export const Card = styled.div`
 `
 
 export const BoardCard = styled(Card)<{
-  canBeAttacked: boolean, 
+  canBeAttacked: boolean
+  isAttackFocus: boolean
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
   onClick: () => void
 }>`
   margin: 0 5px;
@@ -41,9 +44,13 @@ export const BoardCard = styled(Card)<{
   } 
 
   ${({ canBeAttacked }) => canBeAttacked && css`
-    &:hover {
-      background-color: red;
-    }
+      &:hover {
+        background-color: red;
+      }
+  `}
+
+  ${({ isAttackFocus }) => isAttackFocus && css`
+    background-color: red;
   `}
 `
 
@@ -69,4 +76,28 @@ export const SwordIcon = styled.img`
   width: 50px;
   z-index: 100;
   animation: ${AttackAnimation} 1.5s infinite;
+`
+
+const OpponentAttackAnimation = keyframes`
+  0% {
+    bottom: -15px;
+    opacity: 0.3;
+  }
+  50% {
+    bottom: -25px;
+    opacity: 1;
+  }
+  100% {
+    bottom: -15px;
+    opacity: 0.3;
+  }
+`
+
+export const OpponentSwordIcon = styled.img`
+  transform: rotate(135deg);
+  position: absolute;
+  bottom: -15px;
+  width: 50px;
+  z-index: 100;
+  animation: ${OpponentAttackAnimation} 1.5s infinite;
 `

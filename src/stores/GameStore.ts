@@ -22,6 +22,15 @@ class GameStore {
   alreadyAttacked: ICard[] = []
 
   @observable
+  selectedCard: ICard | null = null
+
+  @observable
+  opponentSelectedCard: ICard | null = null
+
+  @observable
+  opponentAttackFocus: ICard | null = null
+
+  @observable
   player: IPlayer = {
     life: 0,
     maxMana: 0,
@@ -89,6 +98,7 @@ class GameStore {
     this.player.mana = data.mana
     this.opponent.mana = data.opponentMana
     this.alreadyAttacked = []
+    this.setOpponentSelectedCard(null)
     SocketService.emit('drawCard')
   }
 
@@ -129,6 +139,43 @@ class GameStore {
     this.player.board = data.board
     this.opponent.life = data.opponentLife
     this.opponent.board = data.opponentBoard
+    this.setOpponentSelectedCard(null)
+  }
+
+  hasAlreadyAttacked(card: ICard) {
+    return this.alreadyAttacked.find(c => c.id === card.id)
+  }
+
+  setSelectedCard(card: ICard | null) {
+    const hasAlreadyAttacked = card && this.hasAlreadyAttacked(card)
+
+    this.selectedCard = card
+
+    if (this.isPlayerTurn && !hasAlreadyAttacked && card) {
+      SocketService.emit('selectedCard', card)
+    }
+  }
+
+  isOpponentSelectedCard(card: ICard) {
+    return this.opponentSelectedCard && this.opponentSelectedCard.id === card.id
+  }
+
+  setOpponentSelectedCard(card: ICard | null) {
+    this.opponentSelectedCard = card
+  }
+
+  isAttackFocus(card: ICard| null) {
+    if (this.isPlayerTurn && this.selectedCard) {
+      SocketService.emit('attackFocus', card)
+    }
+  }
+
+  isOpponentAttackFocus(card: ICard) {
+    return this.opponentAttackFocus && this.opponentAttackFocus.id === card.id
+  }
+
+  setOpponentAttackFocus(card: ICard | null) {
+    this.opponentAttackFocus = card
   }
 }
 

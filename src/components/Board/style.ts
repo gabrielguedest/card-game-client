@@ -1,9 +1,20 @@
 import styled from 'styled-components'
 
+export const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+`
+
 export const Frame = styled.div`
   background-color: #ccc;
-  width: 1024px;
-  height: 720px;
+  min-width: 1024px;
+  min-height: 580px;
   border-radius: 20px;
   position: relative;
   display: flex;
@@ -22,14 +33,15 @@ export const Cards = styled.div`
   position: absolute;
   transform: translate(-50%);
   left: 50%;
+  z-index: 100;
 `
 
 export const OpponentHand = styled(Cards)`
-  top: 5px;
+  top: 20px;
 `
 
 export const PlayerHand = styled(Cards)`
-  bottom: 5px;
+  bottom: 20px;
 `
 
 export const OpponentDeck = styled.div`
@@ -48,7 +60,7 @@ export const PlayerBoard = styled.div`
   display: flex;
   flex-direction: row;
   position: absolute;
-  top: 380px;
+  top: 310px;
   transform: translate(-50%);
   left: 50%;
 `
@@ -58,7 +70,7 @@ export const OpponentBoard = styled.div`
   flex-direction: row;
   position: absolute;
   transform: translate(-50%);
-  top: 190px;
+  top: 120px;
   left: 50%;
 `
 

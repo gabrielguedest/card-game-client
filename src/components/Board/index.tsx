@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react'
 import GameStore from '../../stores/GameStore'
 import SocketService from '../../SocketService'
 import { ICard } from '../../interfaces/Card'
-import { 
+import {
+  Container,
   Frame,
   Divider,
   OpponentHand,
@@ -23,8 +24,6 @@ import { Deck } from '../Deck'
 const Board: React.FC = observer(() => {
   const store = useContext(GameStore)
 
-  const [selectedCard, setSelectedCard] = useState<ICard | null>(null)
-
   const renderOpponentHand = () => {
     let cards = []
 
@@ -36,76 +35,35 @@ const Board: React.FC = observer(() => {
   }
 
   const endTurn = () => {
-    setSelectedCard(null)
+    store.setSelectedCard(null)
     SocketService.emit('endTurn')
   }
 
-  const selectCard = (card: ICard) => {
-    const hasAlreadyAttacked = store.alreadyAttacked.find(c => c.id === card.id)
-
-    if (store.isPlayerTurn && !hasAlreadyAttacked) {
-      setSelectedCard(card)
-    }
-  }
-
   const attackCard = (card: ICard) => {
-    if (!selectedCard) {
+    if (!store.selectedCard) {
       return
     }
 
-    const hasAlreadyAttacked = store.alreadyAttacked.find(c => c.id === selectedCard!.id)
+    const hasAlreadyAttacked = store.alreadyAttacked.find(c => c.id === store.selectedCard!.id)
     
-    if (store.isPlayerTurn && selectedCard && !hasAlreadyAttacked) {
+    if (store.isPlayerTurn && store.selectedCard && !hasAlreadyAttacked) {
       SocketService.emit('attackCard', {
-        attacker: selectedCard,
+        attacker: store.selectedCard,
         attacked: card,
       })
 
-      store.alreadyAttacked.push(selectedCard!)
-      setSelectedCard(null)
+      store.alreadyAttacked.push(store.selectedCard!)
+      store.setSelectedCard(null)
     }
   }
 
   return (
-    <Frame>
-      { 
-        store.isPlayerTurn && 
-        <EndTurnButton onClick={endTurn}>Finalizar Turno</EndTurnButton>
-      }
+    <Container>
       
-      <OpponentLife>
-        HP: {store.opponent.life} - Mana: {store.opponent.mana}/{store.opponent.maxMana}
-      </OpponentLife>
-      <OpponentDeck>        
-        <Deck deckLength={store.opponent.deck}/>
-      </OpponentDeck>
       <OpponentHand>
         {renderOpponentHand()}
       </OpponentHand>
-      <OpponentBoard>
-        { store.opponent.board.map((card: ICard) => 
-          <CardComponent
-            card={card}
-            type="board"
-            canBeAttacked={!!(store.isPlayerTurn && selectedCard)}
-            onClick={() => attackCard(card)}
-          />)}
-      </OpponentBoard>
 
-      <Divider />
-
-      <PlayerBoard>
-        { store.player.board.map((card: ICard) => 
-          <CardComponent 
-            card={card}
-            type="board"
-            isSelected={!!(selectedCard && selectedCard.id === card.id)}
-            onClick={() => selectCard(card)}
-          />)}
-      </PlayerBoard>
-      <PlayerDeck>
-        <Deck deckLength={store.player.deck.length}/>
-      </PlayerDeck>
       <PlayerHand>
         { store.player.hand.map((card: ICard) => 
           <CardComponent 
@@ -114,10 +72,52 @@ const Board: React.FC = observer(() => {
           />)
         }
       </PlayerHand>
-      <PlayerLife>
-        HP: {store.player.life} - Mana: {store.player.mana}/{store.player.maxMana}
-      </PlayerLife>
-    </Frame>
+
+      <Frame>
+        { 
+          store.isPlayerTurn && 
+          <EndTurnButton onClick={endTurn}>Finalizar Turno</EndTurnButton>
+        }
+        
+        <OpponentLife>
+          HP: {store.opponent.life} - Mana: {store.opponent.mana}/{store.opponent.maxMana}
+        </OpponentLife>
+        <OpponentDeck>        
+          <Deck deckLength={store.opponent.deck}/>
+        </OpponentDeck>
+        <OpponentBoard>
+          { store.opponent.board.map((card: ICard) => 
+            <CardComponent
+              card={card}
+              type="board"
+              canBeAttacked={!!(store.isPlayerTurn && store.selectedCard)}
+              isOpponentSelected={!!store.isOpponentSelectedCard(card)}
+              onClick={() => attackCard(card)}
+              onMouseEnter={() => store.isAttackFocus(card)}
+              onMouseLeave={() => store.isAttackFocus(null)}
+            />)}
+        </OpponentBoard>
+
+        <Divider />
+
+        <PlayerBoard>
+          { store.player.board.map((card: ICard) => 
+            <CardComponent 
+              card={card}
+              type="board"
+              isSelected={!!(store.selectedCard && store.selectedCard.id === card.id)}
+              isAttackFocus={!!(store.isOpponentAttackFocus(card))}
+              onClick={() => store.setSelectedCard(card)}
+            />)}
+        </PlayerBoard>
+        <PlayerDeck>
+          <Deck deckLength={store.player.deck.length}/>
+        </PlayerDeck>
+        <PlayerLife>
+          HP: {store.player.life} - Mana: {store.player.mana}/{store.player.maxMana}
+        </PlayerLife>
+      </Frame>
+    </Container>
   )
 })
 

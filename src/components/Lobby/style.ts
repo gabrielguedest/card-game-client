@@ -10,6 +10,8 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   background-color: #383838;
+  min-width: 1280px;
+  min-height: 720px;
 `
 
 export const SearchButton = styled.div`

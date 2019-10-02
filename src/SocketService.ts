@@ -1,6 +1,7 @@
-import { ITurn } from './interfaces/Turn';
-import { IOpponentCardPlayed, ICardPlayed } from './interfaces/CardPlayed';
-import { ICardDrawed, IOpponentCardDrawed } from './interfaces/CardDrawed';
+import { ITurn } from './interfaces/Turn'
+import { IOpponentCardPlayed, ICardPlayed } from './interfaces/CardPlayed'
+import { ICardDrawed, IOpponentCardDrawed } from './interfaces/CardDrawed'
+import { ICard } from './interfaces/Card'
 import { INewMatch } from './interfaces/NewMatch'
 import socketIOClient from 'socket.io-client'
 import { gameStore } from './stores/GameStore'
@@ -40,8 +41,12 @@ class SocketService {
     this.socket.on('cardPlayed', (data: ICardPlayed) => gameStore.cardPlayed(data))
     this.socket.on('opponentCardPlayed', (data: IOpponentCardPlayed) => gameStore.opponentCardPlayed(data))
 
+    // tipar esses parametros
     this.socket.on('cardAttack', (data: any) => gameStore.cardAttack(data))
     this.socket.on('cardAttacked', (data: any) => gameStore.cardAttacked(data))
+
+    this.socket.on('opponentSelectedCard', (data: ICard) => gameStore.setOpponentSelectedCard(data))
+    this.socket.on('isAttackFocus', (data: ICard | null) => gameStore.setOpponentAttackFocus(data))
   }
 }
 
