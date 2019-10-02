@@ -1,5 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './App'
+import Lobby from './components/Lobby'
+import SocketService from './SocketService'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+SocketService.initConnection()
+
+ReactDOM.render(<Lobby />, document.getElementById('root'))

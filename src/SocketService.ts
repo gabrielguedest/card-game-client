@@ -1,0 +1,48 @@
+import { ITurn } from './interfaces/Turn';
+import { IOpponentCardPlayed, ICardPlayed } from './interfaces/CardPlayed';
+import { ICardDrawed, IOpponentCardDrawed } from './interfaces/CardDrawed';
+import { INewMatch } from './interfaces/NewMatch'
+import socketIOClient from 'socket.io-client'
+import { gameStore } from './stores/GameStore'
+
+class SocketService {
+  static instance: SocketService
+  public socket: any
+
+  private constructor() {}
+
+  public initConnection() {
+    this.socket = socketIOClient('http://localhost:5000')
+    this.listenEvents()
+  }
+
+  static getInstance() {
+    if (!SocketService.instance) {
+      SocketService.instance = new SocketService()
+    }
+
+    return SocketService.instance
+  }
+
+  public emit(eventName: string, data?: any) {
+    this.socket.emit(eventName, data)
+  }
+
+  public listenEvents() {
+    this.socket.on('newMatch', (data: INewMatch) => gameStore.setNewMatch(data))
+
+    this.socket.on('cardDrawed', (data: ICardDrawed) => gameStore.cardDrawed(data))
+    this.socket.on('opponentCardDrawed', (data: IOpponentCardDrawed) => gameStore.opponentCardDrawed(data))
+
+    this.socket.on('playerTurn', (data: ITurn) => gameStore.startPlayerTurn(data))
+    this.socket.on('opponentTurn', (data: ITurn) => gameStore.opponentTurn(data))
+
+    this.socket.on('cardPlayed', (data: ICardPlayed) => gameStore.cardPlayed(data))
+    this.socket.on('opponentCardPlayed', (data: IOpponentCardPlayed) => gameStore.opponentCardPlayed(data))
+
+    this.socket.on('cardAttack', (data: any) => gameStore.cardAttack(data))
+    this.socket.on('cardAttacked', (data: any) => gameStore.cardAttacked(data))
+  }
+}
+
+export default SocketService.getInstance()
