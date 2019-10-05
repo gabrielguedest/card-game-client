@@ -106,6 +106,8 @@ class GameStore {
     this.playerTurn = data.actor
     this.opponent.mana = data.opponentMana
     this.player.mana = data.mana
+    this.setSelectedCard(null)
+    console.log(this.selectedCard)
   }
   
   playCard(card: ICard) {
@@ -147,11 +149,14 @@ class GameStore {
   }
 
   setSelectedCard(card: ICard | null) {
+    if (!card) {
+      return this.selectedCard = card
+    }
+
     const hasAlreadyAttacked = card && this.hasAlreadyAttacked(card)
 
-    this.selectedCard = card
-
-    if (this.isPlayerTurn && !hasAlreadyAttacked && card) {
+    if (this.isPlayerTurn && !hasAlreadyAttacked && card) { 
+      this.selectedCard = card
       SocketService.emit('selectedCard', card)
     }
   }
@@ -176,6 +181,26 @@ class GameStore {
 
   setOpponentAttackFocus(card: ICard | null) {
     this.opponentAttackFocus = card
+  }
+
+  canPlay(card: ICard) {
+    const alreadyAttacked = this.alreadyAttacked.find(c => c.id === card.id)
+
+    if (this.isPlayerTurn && !alreadyAttacked && this.player.mana >= card.mana) {
+      return true
+    }
+
+    return false
+  }
+
+  canAttack(card: ICard) {
+    const alreadyAttacked = this.alreadyAttacked.find(c => c.id === card.id)
+
+    if (this.isPlayerTurn && !alreadyAttacked) {
+      return true
+    }
+
+    return false
   }
 }
 

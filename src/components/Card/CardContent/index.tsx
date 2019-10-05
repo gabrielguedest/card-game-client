@@ -1,12 +1,10 @@
 import React from 'react'
-import cardIcon from '../../../assets/cards-icons/027-dragon-3.png'
 import { ICard } from '../../../interfaces/Card'
-import { 
-  ImageContainer,
-  CardImage,
+import {
+  Container,
+  Mana,
   CardName,
   Description,
-  ManaContainer,
   Stats,
 } from './style'
 
@@ -17,19 +15,21 @@ interface ICardContent {
 const CardContent: React.FC<ICardContent> = ({
   card
 }) => (
-  <>
-    <ImageContainer>
-      <CardImage src={cardIcon} />
-    </ImageContainer>
+  <Container>
+    <Mana>
+      <span>{card.mana}</span>
+    </Mana>
     <CardName>{card.name}</CardName>
-    
-    <ManaContainer>{card.mana}</ManaContainer>
-    <Description>{card.description}</Description>
+    <Description>{card.description} Aliados ganham +3 ATQ</Description>
     <Stats>
-      <p>ATQ:<span>{card.attack}</span></p>
-      <p>DEF:<span>{card.defense}</span></p>
+      <div>
+        <span>{card.attack}</span>
+      </div>
+      <div>
+        <span>{card.defense}</span>
+      </div>
     </Stats>
-  </>
+  </Container>
 )
 
 export default CardContent

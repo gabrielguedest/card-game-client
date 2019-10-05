@@ -1,23 +1,21 @@
 import styled from 'styled-components'
 import { cardStyle } from '../Card/style'
+import cardBackImage from '../../assets/card-back.png'
 
 export const CardDeck = styled.div`
-  ${cardStyle};
+  ${cardStyle}; 
 
-  width: 90px;
-  height: 120px;
-  box-shadow: 0px 12px 0px #2c2c2c;
-  background-color: #4A4A4A;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url(${cardBackImage}); 
 
   &:hover {
-    transform: none;
-    background-color: #676666;
+    transform: scale(1.05);
   }
 `
 
-export const DeckLength = styled.h2``
-
-export const BackStar = styled.img`
-  width: 68px;
-  opacity: .1;
+export const DeckLength = styled.h2`
+  color: white;
+  -webkit-text-stroke: 1px black;
 `

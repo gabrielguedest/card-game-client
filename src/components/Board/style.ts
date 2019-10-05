@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const Container = styled.div`
   display: flex;
@@ -65,13 +65,23 @@ export const PlayerBoard = styled.div`
   left: 50%;
 `
 
-export const OpponentBoard = styled.div`
+export const OpponentBoard = styled.div<{ canBeAttacked: boolean }>`
+  width: 70%;
+  min-height: 150px;
+  padding: 10px;
   display: flex;
+  justify-content: center;
   flex-direction: row;
   position: absolute;
-  transform: translate(-50%);
-  top: 120px;
+  top: 110px;
   left: 50%;
+  transform: translate(-50%);
+
+  ${({ canBeAttacked }) => canBeAttacked && css`
+    &:hover {
+      background-color: #ff000014;
+    }
+  `}
 `
 
 export const EndTurnButton = styled.div`

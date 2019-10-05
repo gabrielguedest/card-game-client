@@ -68,24 +68,27 @@ const Board: React.FC = observer(() => {
         { store.player.hand.map((card: ICard) => 
           <CardComponent 
             card={card}
+            canPlay={store.canPlay(card)}
             onClick={() => store.playCard(card)}
           />)
         }
       </PlayerHand>
 
       <Frame>
-        { 
-          store.isPlayerTurn && 
-          <EndTurnButton onClick={endTurn}>Finalizar Turno</EndTurnButton>
-        }
+        {store.isPlayerTurn && 
+        <EndTurnButton onClick={endTurn}>Finalizar Turno</EndTurnButton>}
         
         <OpponentLife>
           HP: {store.opponent.life} - Mana: {store.opponent.mana}/{store.opponent.maxMana}
         </OpponentLife>
+
         <OpponentDeck>        
           <Deck deckLength={store.opponent.deck}/>
         </OpponentDeck>
-        <OpponentBoard>
+
+        <OpponentBoard
+          canBeAttacked={!!(store.isPlayerTurn && !store.opponent.board.length && store.selectedCard)}
+        >
           { store.opponent.board.map((card: ICard) => 
             <CardComponent
               card={card}
@@ -108,11 +111,14 @@ const Board: React.FC = observer(() => {
               isSelected={!!(store.selectedCard && store.selectedCard.id === card.id)}
               isAttackFocus={!!(store.isOpponentAttackFocus(card))}
               onClick={() => store.setSelectedCard(card)}
+              canPlay={store.canAttack(card)}
             />)}
         </PlayerBoard>
+
         <PlayerDeck>
           <Deck deckLength={store.player.deck.length}/>
         </PlayerDeck>
+        
         <PlayerLife>
           HP: {store.player.life} - Mana: {store.player.mana}/{store.player.maxMana}
         </PlayerLife>

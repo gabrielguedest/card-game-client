@@ -1,58 +1,75 @@
 import styled from 'styled-components'
 
-export const ImageContainer = styled.div`
+export const Container = styled.div`
   position: relative;
-  width: 75px;
-  height: 75px;
-  border-radius: 50px;
-  background-color: rgba(0, 0, 0, .05);
+`
+
+export const Mana = styled.div`
+  height: 17px;
+  width: 20px;
   display: flex;
-  justify-content: center;
   align-items: center;
-`
+  justify-content: center;
+  text-align: center;
 
-export const CardImage = styled.img`
-  width: 63px;
-  height: 63px;
-`
-
-export const CardName = styled.div`
-  border-radius: 15px;
-  margin-top: -23px;
-  padding: 3px 5px;
-  background-color: rgba(0, 0, 0, 0.5);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  font-weight: bold;
-  color: white;
-  text-transform: uppercase;
-  z-index: 1;
-`
-
-export const Description = styled.p`
-  margin-top: 5px;
-  font-weight: 200;
-  font-size: 8px;
-`
-
-export const Stats = styled.div`
-  margin-bottom: 4px;
-
-  p {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 200;
-    text-transform: uppercase;
-    margin: 0 5px;
-
-    span {
-      font-weight: bold;
-    }
+  span {
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, .85);
+    text-shadow: 0px 0px 2px black;
   }
 `
 
-export const ManaContainer = styled.div`
+export const CardName = styled.p`
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  font-size: .5rem;
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 68px;
+  text-shadow: 0px 0px 2px black;
+  text-align: center;
+`
+
+export const Description = styled.div`
+  width: 75%;
+  height: 30px;
+  margin: 8px auto 5px auto;
   display: flex;
-  flex-direction: row;
-  margin-top: 15px;
+  justify-content: center;
+  align-items: center;
+  font-size: .4rem;
+  font-weight: 200;
+  text-align: center;
+  color: rgba(0, 0, 0, .8);
+`
+
+export const Stats = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: -5px;
+
+  div:first-child {
+    margin-left: 4.5px;
+  }
+
+  div:last-child {
+    margin-right: 5px;
+  }
+
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 15px;
+
+    span {
+      font-size: .6rem;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0.3px 0.3px 2px black;
+    }
+  }
 `

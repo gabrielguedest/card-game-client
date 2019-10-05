@@ -1,17 +1,14 @@
 import styled from 'styled-components'
 import { cardStyle } from '../style'
+import cardBackImage from '../../../assets/card-back.png'
 
 export const CardBack = styled.div`
   ${cardStyle}; 
 
-  background-color: #4A4A4A;
+  background-image: url(${cardBackImage}); 
 
   &:hover {
+    transform: scale(1.1);
     margin-bottom: -30px;
   }
-`
-
-export const BackStar = styled.img`
-  width: 68px;
-  opacity: .1;
 `

@@ -1,81 +1,104 @@
 import styled, { css, keyframes } from 'styled-components'
 
 export const cardStyle = css`
-  width: 100px;
-  height: 140px;
-  border-radius: 5px;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  width: 101px;
+  height: 150px;
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
-  border: 4px solid #404040;
+  border-radius: 8px;
+  background-size: cover;
   cursor: pointer;
-  transition: all 150ms ease-in-out;
-
-  &:hover {
-    z-index: 2;
-    transform: scale(1.4);
-  }
+  transition: transform 100ms linear;
 `
 
-export const Card = styled.div`
+export const Card = styled.div<{ background: string, canPlay: boolean }>`
   ${cardStyle};
 
+  background-image: url(${props => props.background});
+
   &:hover {
-    margin-top: -30px;
+    box-shadow: 0px 0px 5px 2px ${({ canPlay }) => canPlay ? 'green' : 'red'};
+    transform: scale(1.5) translateY(-30px);
+    z-index: 2;
   }
 `
 
-export const BoardCard = styled(Card)<{
+const PlayCard = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`
+
+export const BoardCard = styled.div<{
   canBeAttacked: boolean
   isAttackFocus: boolean
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onClick: () => void
+  background: string
+  canPlay: boolean
 }>`
+  ${cardStyle};
+
   margin: 0 5px;
   transition: all 125ms linear;
+  background-image: url(${props => props.background});
+  animation: ${PlayCard} 1s;
 
   &:hover {
     transform: scale(1.1);
     margin-top: 0px;
+    box-shadow: 0px 0px 5px 2px ${({ canPlay }) => canPlay ? 'green' : 'red'};
   } 
 
   ${({ canBeAttacked }) => canBeAttacked && css`
-      &:hover {
-        background-color: red;
-      }
+    &:hover {
+      box-shadow: 0px 0px 5px 2px red;
+    }
   `}
 
   ${({ isAttackFocus }) => isAttackFocus && css`
-    background-color: red;
+    box-shadow: 0px 0px 5px 2px red;
   `}
 `
 
 const AttackAnimation = keyframes`
   0% {
-    top: -15px;
-    opacity: 0.3;
+    transform: scale(1);
+    opacity: 0.7;
   }
   50% {
-    top: -25px;
+    transform: scale(1.4);
     opacity: 1;
   }
   100% {
-    top: -15px;
-    opacity: 0.3;
+    transform: scale(1);
+    opacity: 0.7;
   }
 `
 
-export const SwordIcon = styled.img`
-  transform: rotate(-45deg);
+const SwordOpacity = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
+export const SwordContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  top: -15px;
+  height: 150px;
+  width: 101px;
+` 
+
+export const SwordIcon = styled.img`
   width: 50px;
   z-index: 100;
-  animation: ${AttackAnimation} 1.5s infinite;
+  animation: ${AttackAnimation} 1.5s infinite, ${SwordOpacity} 1s;
 `
 
 const OpponentAttackAnimation = keyframes`
