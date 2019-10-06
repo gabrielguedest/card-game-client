@@ -7,7 +7,7 @@ import { IOpponent } from '../interfaces/Opponent'
 import { ICardDrawed, IOpponentCardDrawed } from '../interfaces/CardDrawed'
 import { ITurn } from './../interfaces/Turn'
 import { ICardPlayed, IOpponentCardPlayed } from '../interfaces/CardPlayed'
-import SocketService from '../SocketService';
+import SocketService from '../SocketService'
 
 class GameStore {
   static instance: GameStore

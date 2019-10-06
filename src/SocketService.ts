@@ -6,6 +6,28 @@ import { INewMatch } from './interfaces/NewMatch'
 import socketIOClient from 'socket.io-client'
 import { gameStore } from './stores/GameStore'
 
+export enum SocketEvents {
+  NEW_MATCH = 'newMatch',
+  CARD_DRAWED = 'cardDrawed',
+  OPPONENT_CARD_DRAWED = 'opponentCardDrawed',
+  PLAYER_TURN = 'playerTurn',
+  OPPONENT_TURN = 'opponentTurn',
+  CARD_PLAYED = 'cardPlayed',
+  OPPONENT_CARD_PLAYED = 'opponentCardPlayed',
+  CARD_ATTACK = 'cardAttack',
+  CARD_ATTACKED = 'cardAttacked',
+  OPPONENT_SELECTED_CARD = 'opponentSelectedCard',
+  IS_ATTACK_FOCUS = 'isAttackFocus',
+  BOARD_ATTACK_FOCUS = 'boardAttackFocus',
+  BOARD_LOSE_ATTACK_FOCUS = 'boardLoseAttackFocus',
+  BOARD_ATTACKED = 'boardAttacked',
+  VICTORY = 'victory',
+  DEFEAT = 'defeat',
+
+  DRAW_CARD = 'drawCard',
+  PLAY_CARD = 'playCard',
+}
+
 class SocketService {
   static instance: SocketService
   public socket: any
@@ -25,37 +47,37 @@ class SocketService {
     return SocketService.instance
   }
 
-  public emit(eventName: string, data?: any) {
+  public emit(eventName: SocketEvents, data?: any) {
     this.socket.emit(eventName, data)
   }
 
   public listenEvents() {
-    this.socket.on('newMatch', (data: INewMatch) => gameStore.setNewMatch(data))
+    this.socket.on(SocketEvents.NEW_MATCH, (data: INewMatch) => gameStore.setNewMatch(data))
 
-    this.socket.on('cardDrawed', (data: ICardDrawed) => gameStore.cardDrawed(data))
-    this.socket.on('opponentCardDrawed', (data: IOpponentCardDrawed) => gameStore.opponentCardDrawed(data))
+    this.socket.on(SocketEvents.CARD_DRAWED, (data: ICardDrawed) => gameStore.cardDrawed(data))
+    this.socket.on(SocketEvents.OPPONENT_CARD_DRAWED, (data: IOpponentCardDrawed) => gameStore.opponentCardDrawed(data))
 
-    this.socket.on('playerTurn', (data: ITurn) => gameStore.startPlayerTurn(data))
-    this.socket.on('opponentTurn', (data: ITurn) => gameStore.opponentTurn(data))
+    this.socket.on(SocketEvents.PLAYER_TURN, (data: ITurn) => gameStore.startPlayerTurn(data))
+    this.socket.on(SocketEvents.OPPONENT_TURN, (data: ITurn) => gameStore.opponentTurn(data))
 
-    this.socket.on('cardPlayed', (data: ICardPlayed) => gameStore.cardPlayed(data))
-    this.socket.on('opponentCardPlayed', (data: IOpponentCardPlayed) => gameStore.opponentCardPlayed(data))
+    this.socket.on(SocketEvents.CARD_PLAYED, (data: ICardPlayed) => gameStore.cardPlayed(data))
+    this.socket.on(SocketEvents.OPPONENT_CARD_PLAYED, (data: IOpponentCardPlayed) => gameStore.opponentCardPlayed(data))
 
     // tipar esses parametros
-    this.socket.on('cardAttack', (data: any) => gameStore.cardAttack(data))
-    this.socket.on('cardAttacked', (data: any) =>  gameStore.cardAttacked(data))
+    this.socket.on(SocketEvents.CARD_ATTACK, (data: any) => gameStore.cardAttack(data))
+    this.socket.on(SocketEvents.CARD_ATTACKED, (data: any) =>  gameStore.cardAttacked(data))
 
-    this.socket.on('opponentSelectedCard', (data: ICard) => gameStore.setOpponentSelectedCard(data))
-    this.socket.on('isAttackFocus', (data: ICard | null) => gameStore.setOpponentAttackFocus(data))
+    this.socket.on(SocketEvents.OPPONENT_SELECTED_CARD, (data: ICard) => gameStore.setOpponentSelectedCard(data))
+    this.socket.on(SocketEvents.IS_ATTACK_FOCUS, (data: ICard | null) => gameStore.setOpponentAttackFocus(data))
 
-    this.socket.on('boardAttackFocus', () => gameStore.boardAttackFocus())
+    this.socket.on(SocketEvents.BOARD_ATTACK_FOCUS, () => gameStore.boardAttackFocus())
 
-    this.socket.on('boardLoseAttackFocus', () => gameStore.boardAttackFocus())
+    this.socket.on(SocketEvents.BOARD_LOSE_ATTACK_FOCUS, () => gameStore.boardAttackFocus())
 
-    this.socket.on('boardAttacked', (life: number) => gameStore.boardAttacked(life))
+    this.socket.on(SocketEvents.BOARD_ATTACKED, (life: number) => gameStore.boardAttacked(life))
 
-    this.socket.on('victory', () => console.log('victory'))
-    this.socket.on('defeat', () => console.log('defeat'))
+    this.socket.on(SocketEvents.VICTORY, () => console.log('victory'))
+    this.socket.on(SocketEvents.DEFEAT, () => console.log('defeat'))
   }
 }
 
