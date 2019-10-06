@@ -31,6 +31,9 @@ class GameStore {
   opponentAttackFocus: ICard | null = null
 
   @observable
+  boardOnAttackFocus: boolean = false
+
+  @observable
   player: IPlayer = {
     life: 0,
     maxMana: 0,
@@ -107,7 +110,6 @@ class GameStore {
     this.opponent.mana = data.opponentMana
     this.player.mana = data.mana
     this.setSelectedCard(null)
-    console.log(this.selectedCard)
   }
   
   playCard(card: ICard) {
@@ -142,6 +144,23 @@ class GameStore {
     this.opponent.life = data.opponentLife
     this.opponent.board = data.opponentBoard
     this.setOpponentSelectedCard(null)
+  }
+
+  boardAttack() {
+    if (this.isPlayerTurn && !this.opponent.board.length && this.selectedCard) {
+      SocketService.emit('boardAttack', this.selectedCard)
+      this.opponent.life = (this.opponent.life - this.selectedCard.attack) > 0
+        ? this.opponent.life - this.selectedCard.attack
+        : 0
+      this.alreadyAttacked.push(this.selectedCard)
+      this.setSelectedCard(null)
+    }    
+  }
+
+  boardAttacked(life: number) {
+    this.setOpponentSelectedCard(null)
+    this.boardOnAttackFocus = false
+    this.player.life = life
   }
 
   hasAlreadyAttacked(card: ICard) {
@@ -201,6 +220,23 @@ class GameStore {
     }
 
     return false
+  }
+
+  boardFocusAttack() {
+    if (this.isPlayerTurn && !this.opponent.board.length && this.selectedCard) {
+      SocketService.emit('boardAttackFocus')
+    }
+  }
+
+  boardLoseAttackFocus() {
+    if (this.isPlayerTurn && !this.opponent.board.length && this.selectedCard) {
+      console.log('emitindo evento')
+      SocketService.emit('boardLoseAttackFocus')
+    }
+  }
+
+  boardAttackFocus() {
+    this.boardOnAttackFocus = !this.boardOnAttackFocus
   }
 }
 

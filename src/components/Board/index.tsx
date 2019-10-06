@@ -16,10 +16,12 @@ import {
   EndTurnButton,
   OpponentLife,
   PlayerLife,
+  DefenseIcon,
 } from './style'
 import { CardComponent } from '../Card/CardComponent'
 import { CardBackComponent as CardBack } from '../Card/CardBack'
 import { Deck } from '../Deck'
+import defenseIcon from '../../assets/icons/shield.png'
 
 const Board: React.FC = observer(() => {
   const store = useContext(GameStore)
@@ -57,6 +59,10 @@ const Board: React.FC = observer(() => {
     }
   }
 
+  const selectCard = (card: ICard) => {
+    store.setSelectedCard(card)
+  }
+
   return (
     <Container>
       
@@ -88,7 +94,11 @@ const Board: React.FC = observer(() => {
 
         <OpponentBoard
           canBeAttacked={!!(store.isPlayerTurn && !store.opponent.board.length && store.selectedCard)}
+          onMouseEnter={() => store.boardFocusAttack()}
+          onMouseLeave={() => store.boardLoseAttackFocus()}
+          onClick={() => store.boardAttack()}
         >
+          <DefenseIcon src={defenseIcon} />
           { store.opponent.board.map((card: ICard) => 
             <CardComponent
               card={card}
@@ -103,14 +113,15 @@ const Board: React.FC = observer(() => {
 
         <Divider />
 
-        <PlayerBoard>
-          { store.player.board.map((card: ICard) => 
-            <CardComponent 
+        <PlayerBoard isOnAttackFocus={store.boardOnAttackFocus}>
+          <DefenseIcon src={defenseIcon} />
+          { store.player.board.map((card: ICard) =>
+            <CardComponent
               card={card}
               type="board"
               isSelected={!!(store.selectedCard && store.selectedCard.id === card.id)}
               isAttackFocus={!!(store.isOpponentAttackFocus(card))}
-              onClick={() => store.setSelectedCard(card)}
+              onClick={() => selectCard(card)}
               canPlay={store.canAttack(card)}
             />)}
         </PlayerBoard>

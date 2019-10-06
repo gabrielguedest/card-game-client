@@ -43,10 +43,19 @@ class SocketService {
 
     // tipar esses parametros
     this.socket.on('cardAttack', (data: any) => gameStore.cardAttack(data))
-    this.socket.on('cardAttacked', (data: any) => gameStore.cardAttacked(data))
+    this.socket.on('cardAttacked', (data: any) =>  gameStore.cardAttacked(data))
 
     this.socket.on('opponentSelectedCard', (data: ICard) => gameStore.setOpponentSelectedCard(data))
     this.socket.on('isAttackFocus', (data: ICard | null) => gameStore.setOpponentAttackFocus(data))
+
+    this.socket.on('boardAttackFocus', () => gameStore.boardAttackFocus())
+
+    this.socket.on('boardLoseAttackFocus', () => gameStore.boardAttackFocus())
+
+    this.socket.on('boardAttacked', (life: number) => gameStore.boardAttacked(life))
+
+    this.socket.on('victory', () => console.log('victory'))
+    this.socket.on('defeat', () => console.log('defeat'))
   }
 }
 
