@@ -9,8 +9,8 @@ import { observable, computed } from "mobx"
 import SocketService, { SocketEvents } from '../SocketService'
 
 export class MatchStore {
-  playerStore: PlayerStore
-  opponentStore: OpponentStore
+  player: PlayerStore
+  opponent: OpponentStore
 
   @observable
   hasActiveGame: boolean = false
@@ -18,14 +18,22 @@ export class MatchStore {
   @observable
   actualPlayer: string = ''
 
+  @observable
+  boardOnAttackFocus: boolean = false
+
   constructor(playerStore: PlayerStore, opponentStore: OpponentStore) {
-    this.playerStore = playerStore
-    this.opponentStore = opponentStore
+    this.player = playerStore
+    this.opponent = opponentStore
+  }
+
+  @computed
+  get isPlayerTurn() {
+    return SocketService.socket.id === this.actualPlayer
   }
 
   newMatch(data: INewMatch) {
-    this.playerStore.initPlayer(data.player)  
-    this.opponentStore.initOpponent(data.opponent)
+    this.player.initPlayer(data.player)  
+    this.opponent.initOpponent(data.opponent)
     this.hasActiveGame = true
     this.actualPlayer = data.actor
   }
@@ -38,49 +46,95 @@ export class MatchStore {
 
   playerTurn(data: ITurn) {
     this.actualPlayer = data.actor
-    this.playerStore.mana = data.mana
-    this.playerStore.inactiveCards = []
+    this.player.mana = data.mana
+    this.player.inactiveCards = []
 
-    this.opponentStore.mana = data.opponentMana
-    this.opponentStore.setSelectedCard(null)
+    this.opponent.mana = data.opponentMana
+    this.opponent.setSelectedCard(null)
 
     SocketService.emit(SocketEvents.DRAW_CARD)
   }
 
   opponentTurn(data: ITurn) {
     this.actualPlayer = data.actor
-    this.opponentStore.mana = data.opponentMana
+    this.opponent.mana = data.opponentMana
 
-    this.playerStore.mana = data.mana
-    this.playerStore.setSelectedCard(null)
+    this.player.mana = data.mana
+    this.player.setSelectedCard(null, this.isPlayerTurn)
   }
 
   cardDrawed(data: ICardDrawed) {
-    this.playerStore.addHandCards(data.drawedCards)
-    this.playerStore.deck = data.deck
+    this.player.addHandCards(data.drawedCards)
+    this.player.deck = data.deck
   }
 
   opponentCardDrawed(data: IOpponentCardDrawed) {
-    this.opponentStore.hand = data.hand
-    this.opponentStore.deck = data.deck
-  }
-
-  playerCard(card: ICard) {
-    if (this.isPlayerTurn) {
-      SocketService.emit(SocketEvents.PLAY_CARD, card)
-    }
+    this.opponent.hand = data.hand
+    this.opponent.deck = data.deck
   }
 
   cardPlayed(data: ICardPlayed) {
-    this.playerStore.onCardPlayed(data)
+    this.player.onCardPlayed(data)
   }
 
   opponentCardPlayed(data: IOpponentCardPlayed) {
-    this.opponentStore.onCardPlayed(data)
+    this.opponent.onCardPlayed(data)
   }
 
-  @computed
-  get isPlayerTurn() {
-    return SocketService.socket.id === this.actualPlayer
+  cardAttack(data: any) {
+    this.player.life = data.life
+    this.player.board = data.board
+
+    this.opponent.life = data.opponentLife
+    this.opponent.board = data.opponentBoard
+  }
+
+  cardAttacked(data: any) {
+    this.player.life = data.life
+    this.player.board = data.board
+
+    this.opponent.life = data.opponentLife
+    this.opponent.board = data.opponentBoard
+    this.opponent.setSelectedCard(null)
+  }
+
+  boardAttack() {
+    if (this.isPlayerTurn && !this.opponent.board.length && this.player.selectedCard) {
+      SocketService.emit(SocketEvents.BOARD_ATTACK, this.player.selectedCard)
+
+      const opponentLifeAfterAttack = this.opponent.life - this.player.selectedCard.attack
+      this.opponent.life = opponentLifeAfterAttack > 0 ? opponentLifeAfterAttack : 0
+
+      this.player.inactiveCards.push(this.player.selectedCard)
+      this.player.setSelectedCard(null, this.isPlayerTurn)
+    }
+  }
+
+  boardAttacked(life: number) {
+    this.player.life = life
+    this.opponent.setSelectedCard(null)
+    this.boardOnAttackFocus = false
+  }
+
+  playerAttackFocus(card: ICard | null) {
+    if (this.isPlayerTurn && this.player.selectedCard) {
+      SocketService.emit(SocketEvents.ATTACK_FOCUS, card)
+    }
+  }
+
+  boardFocusAttack() {
+    if (this.isPlayerTurn && !this.opponent.board.length && this.player.selectedCard) {
+      SocketService.emit(SocketEvents.BOARD_ATTACK_FOCUS)
+    }
+  }
+
+  boardLoseAttackFocus() {
+    if (this.isPlayerTurn && !this.opponent.board.length && this.player.selectedCard) {
+      SocketService.emit(SocketEvents.BOARD_LOSE_ATTACK_FOCUS)
+    }
+  }
+
+  boardAttackFocus() {
+    this.boardOnAttackFocus = !this.boardOnAttackFocus
   }
 }

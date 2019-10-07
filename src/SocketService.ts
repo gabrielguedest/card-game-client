@@ -4,7 +4,7 @@ import { ICardDrawed, IOpponentCardDrawed } from './interfaces/CardDrawed'
 import { ICard } from './interfaces/Card'
 import { INewMatch } from './interfaces/NewMatch'
 import socketIOClient from 'socket.io-client'
-import { gameStore } from './stores/GameStore'
+import { rootStore } from './stores/RootStore'
 
 export enum SocketEvents {
   NEW_MATCH = 'newMatch',
@@ -26,6 +26,15 @@ export enum SocketEvents {
 
   DRAW_CARD = 'drawCard',
   PLAY_CARD = 'playCard',
+  BOARD_ATTACK = 'boardAttack',
+  SELECTED_CARD = 'selectedCard',
+  ATTACK_FOCUS = 'attackFocus',
+  ATTACK_CARD = 'attackCard',
+
+  READY = 'ready',
+  UNREADY = 'unready',
+  
+  END_TURN = 'endTurn',
 }
 
 class SocketService {
@@ -52,29 +61,32 @@ class SocketService {
   }
 
   public listenEvents() {
-    this.socket.on(SocketEvents.NEW_MATCH, (data: INewMatch) => gameStore.setNewMatch(data))
+    const { matchStore } = rootStore
+    const { opponent } = matchStore
 
-    this.socket.on(SocketEvents.CARD_DRAWED, (data: ICardDrawed) => gameStore.cardDrawed(data))
-    this.socket.on(SocketEvents.OPPONENT_CARD_DRAWED, (data: IOpponentCardDrawed) => gameStore.opponentCardDrawed(data))
+    this.socket.on(SocketEvents.NEW_MATCH, (data: INewMatch) => matchStore.newMatch(data))
 
-    this.socket.on(SocketEvents.PLAYER_TURN, (data: ITurn) => gameStore.startPlayerTurn(data))
-    this.socket.on(SocketEvents.OPPONENT_TURN, (data: ITurn) => gameStore.opponentTurn(data))
+    this.socket.on(SocketEvents.CARD_DRAWED, (data: ICardDrawed) => matchStore.cardDrawed(data))
+    this.socket.on(SocketEvents.OPPONENT_CARD_DRAWED, (data: IOpponentCardDrawed) => matchStore.opponentCardDrawed(data))
 
-    this.socket.on(SocketEvents.CARD_PLAYED, (data: ICardPlayed) => gameStore.cardPlayed(data))
-    this.socket.on(SocketEvents.OPPONENT_CARD_PLAYED, (data: IOpponentCardPlayed) => gameStore.opponentCardPlayed(data))
+    this.socket.on(SocketEvents.PLAYER_TURN, (data: ITurn) => matchStore.playerTurn(data))
+    this.socket.on(SocketEvents.OPPONENT_TURN, (data: ITurn) => matchStore.opponentTurn(data))
+
+    this.socket.on(SocketEvents.CARD_PLAYED, (data: ICardPlayed) => matchStore.cardPlayed(data))
+    this.socket.on(SocketEvents.OPPONENT_CARD_PLAYED, (data: IOpponentCardPlayed) => matchStore.opponentCardPlayed(data))
 
     // tipar esses parametros
-    this.socket.on(SocketEvents.CARD_ATTACK, (data: any) => gameStore.cardAttack(data))
-    this.socket.on(SocketEvents.CARD_ATTACKED, (data: any) =>  gameStore.cardAttacked(data))
+    this.socket.on(SocketEvents.CARD_ATTACK, (data: any) => matchStore.cardAttack(data))
+    this.socket.on(SocketEvents.CARD_ATTACKED, (data: any) =>  matchStore.cardAttacked(data))
 
-    this.socket.on(SocketEvents.OPPONENT_SELECTED_CARD, (data: ICard) => gameStore.setOpponentSelectedCard(data))
-    this.socket.on(SocketEvents.IS_ATTACK_FOCUS, (data: ICard | null) => gameStore.setOpponentAttackFocus(data))
+    this.socket.on(SocketEvents.OPPONENT_SELECTED_CARD, (data: ICard) => opponent.setSelectedCard(data))
+    this.socket.on(SocketEvents.IS_ATTACK_FOCUS, (data: ICard | null) => opponent.setAttackFocus(data))
 
-    this.socket.on(SocketEvents.BOARD_ATTACK_FOCUS, () => gameStore.boardAttackFocus())
+    this.socket.on(SocketEvents.BOARD_ATTACK_FOCUS, () => matchStore.boardAttackFocus())
 
-    this.socket.on(SocketEvents.BOARD_LOSE_ATTACK_FOCUS, () => gameStore.boardAttackFocus())
+    this.socket.on(SocketEvents.BOARD_LOSE_ATTACK_FOCUS, () => matchStore.boardAttackFocus())
 
-    this.socket.on(SocketEvents.BOARD_ATTACKED, (life: number) => gameStore.boardAttacked(life))
+    this.socket.on(SocketEvents.BOARD_ATTACKED, (life: number) => matchStore.boardAttacked(life))
 
     this.socket.on(SocketEvents.VICTORY, () => console.log('victory'))
     this.socket.on(SocketEvents.DEFEAT, () => console.log('defeat'))

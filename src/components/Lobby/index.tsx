@@ -1,21 +1,22 @@
 import React, { useContext, useState } from 'react'
 import { observer } from 'mobx-react'
-import GameStore from '../../stores/GameStore'
-import SocketService from '../../SocketService'
+import SocketService, { SocketEvents } from '../../SocketService'
 import Board from '../Board'
 import { Container, SearchButton} from './style'
+import RootStore from '../../stores/RootStore'
 
 const Lobby: React.FC = observer(() => {
-  const store = useContext(GameStore)
+  const rootStore = useContext(RootStore)
   const [searching, setSearching] = useState(false)
+  const { matchStore } = rootStore
 
   const searchGame = () => {
     setSearching(!searching)
 
     if (searching) {
-      SocketService.emit('unready')
+      SocketService.emit(SocketEvents.UNREADY)
     } else {
-      SocketService.emit('ready')
+      SocketService.emit(SocketEvents.READY)
     }
   }
 
@@ -29,7 +30,7 @@ const Lobby: React.FC = observer(() => {
 
   return (
     <Container>
-      { store.hasActiveGame
+      { matchStore.hasActiveGame
         ? <Board />
         : renderButton()}
     </Container>

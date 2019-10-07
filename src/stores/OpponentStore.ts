@@ -25,6 +25,9 @@ export class OpponentStore {
   @observable
   selectedCard: ICard | null = null
 
+  @observable
+  attackFocus: ICard | null = null
+
   initOpponent(opponent: IOpponent) {
     this.life = opponent.life
     this.maxMana = opponent.maxMana
@@ -41,5 +44,17 @@ export class OpponentStore {
     this.board = data.board
     this.hand = data.hand
     this.mana = data.opponentMana
+  }
+
+  isSelectedCard(card: ICard) {
+    return !!(this.selectedCard && this.selectedCard.id === card.id)
+  }
+
+  isAttackFocus(card: ICard) {
+    return !!(this.attackFocus && this.attackFocus.id === card.id)
+  }
+
+  setAttackFocus(card: ICard | null) {
+    this.attackFocus = card
   }
 }
